@@ -15,7 +15,6 @@
 <body>
 <!--HTML content goes here-->
 
-
 <nav class="app-nav">
     <h1 class="app-title">Monthly Statements</h1>
 </nav>
@@ -23,7 +22,7 @@
 <div class="content">
     <section class="flex select-form-container" id="filter-view">
         <div class="select">
-            <select id="user-select">
+            <select onchange="onDropdownChange(this.value)" id="user-select">
                 <option selected disabled value="-1">Select User</option>
                 <option value="1">John Oliver</option>
                 <option value="2">Bob Martin</option>
@@ -32,7 +31,7 @@
             </select>
         </div>
 
-        <button type="submit" disabled id="submit-btn">
+        <button type="submit" onclick="onSubmitClick()" disabled id="submit-btn">
             Show
         </button>
     </section>
