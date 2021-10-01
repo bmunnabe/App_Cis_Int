@@ -1,6 +1,5 @@
-const monthlyStatements = ( document ) => document.getElementById('monthly-statements');
-let selectedId = '';
-let page = 1;
+let selectedId = null;
+let currentPage = 1;
 let maxPage  = 1;
 
 const createDiv = ( { id, userName, amount, txnType, location : { address }, timestamp } ) => {
@@ -34,51 +33,68 @@ const createDiv = ( { id, userName, amount, txnType, location : { address }, tim
     </div>`
 }
 
-function callApiAndRenderHtml( id, page = 1, successCallback ) {
-  const loader = document.getElementById('loader-view');
-  loader.style.display = 'block';
-  monthlyStatements( document ).style.display = 'none';
-  axios
-    .get( `https://jsonmock.hackerrank.com/api/transactions?userId=${ id }&page=${ page }` )
-    .then( ( { data : { data : records, total_pages } } ) => {
-      maxPage = total_pages;
-      const htmlContent = records.map( ( item ) => createDiv( item ) ).join('');
-      successCallback( htmlContent );
-      loader.style.display = 'none';
-      monthlyStatements( document ).style.display = 'flex';
-    } )
-    .catch( ( err ) => console.log( err ) );
+const getData = ( id, page = 1 ) => {
+  return new Promise( ( resolve, reject ) => {
+    const url =  `https://jsonmock.hackerrank.com/api/transactions?userId=${ id }&page=${ page }`;
+    axios.get( url )
+      .then( ( { data : { data : records, total_pages } } ) => {
+        maxPage = total_pages;
+        return resolve( records )
+      } )
+      .catch( err => reject( err ) );
+  } )
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const submitButton = document.getElementById('submit-btn');
-  const dropdown = document.getElementById('user-select');
-  submitButton.addEventListener( 'click', () => {
-    page = 1;
-    monthlyStatements( document ).innerHTML = '';
-    callApiAndRenderHtml( selectedId, page, ( htmlContent ) => monthlyStatements( document ).innerHTML = htmlContent );
-  } );
-  dropdown.addEventListener( 'change', (e) => {
-    if ( e.target.value ) {
-      selectedId = e.target.value;
-      submitButton.disabled = false;
+const displaySpinner = ( show ) => {
+  document.getElementById('loader-view').style.display = show ? 'block' : 'none';
+  document.getElementById('monthly-statements').style.display = show ? 'none' : 'flex';
+}
+
+const renderStatement = ( data, append = false ) => {
+  const statement = document.getElementById('monthly-statements');
+  const _html = data.map( ( item ) => createDiv( item ) ).join('');
+  if ( append ) {
+    statement.insertAdjacentHTML( 'beforeend',  _html );
+  } else {
+    statement.innerHTML = _html;
+  }
+}
+
+function onDropdownChange( value ) {
+  if ( value ) {
+    selectedId = value;
+    document.getElementById('submit-btn').disabled = false;
+  }
+}
+
+function onSubmitClick() {
+  currentPage = 1;
+  getDataAndRender()
+}
+
+function getDataAndRender( isAppend ) {
+  displaySpinner( true );
+  getData( selectedId, currentPage )
+    .then( ( data ) => {
+      renderStatement( data, isAppend )
+      displaySpinner( false );
+    } )
+    .catch( err => console.log( err ) );
+}
+
+const scrollHandler = () => {
+  const clientHeight = Math.max( document.documentElement.scrollTop, document.body.scrollTop ) + document.documentElement.clientHeight;
+  const scrollHeight = document.documentElement.scrollHeight;
+  if ( clientHeight >= scrollHeight ) {
+    if ( currentPage < maxPage && selectedId ) {
+      currentPage = currentPage + 1;
+      getDataAndRender( true )
     }
-  } );
-} );
+  }
+}
 
 if ( window.addEventListener ) {
   window.addEventListener( 'scroll', scrollHandler )
 } else if ( window.attachEvent ) {
   window.attachEvent( 'onscroll',scrollHandler );
-}
-
-function scrollHandler() {
-  const clientHeight = Math.max( document.documentElement.scrollTop, document.body.scrollTop ) + document.documentElement.clientHeight;
-  const scrollHeight = document.documentElement.scrollHeight;
-  if ( clientHeight >= scrollHeight ) {
-    if ( page < maxPage && selectedId ) {
-      page = page + 1;
-      callApiAndRenderHtml( selectedId, page, ( htmlContent ) => monthlyStatements( document ).insertAdjacentHTML( 'beforeend',  htmlContent ) );
-    }
-  }
 }
