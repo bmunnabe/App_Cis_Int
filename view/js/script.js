@@ -3,20 +3,35 @@ let selectedId = '';
 let page = 1;
 let maxPage  = 1;
 
-const createDiv = ( data ) => {
+const createDiv = ( { id, userName, amount, txnType, location : { address }, timestamp } ) => {
   let div = document.createElement('div');
   return div.innerHTML = `
     <div class="details">
-      <p>Id: <span class="info">${ data.id }</span></p>
-      <p>User: <span class="info">${ data.userName }</span></p>
-      <p>Amount: <span class="info">${ data.amount }</span></p>
-      <p>Transaction Type: <span class="info">${ data.txnType }</span></p>
-      <p>Address: <span class="info">${ data.location.address }</span></p>
-      <p>Transaction Time: <span class="info">${
-        ( new Date( data.timestamp ) ).toString().slice(0, 24)
-      }</span></p>
-    </div>
-  `
+      <div class="text">
+        <label for="">Id:</label>
+        <p class="info">${ id }</p>
+      </div>
+      <div class="text">
+        <label for="">User:</label>
+        <p class="info">${ userName }</p>
+      </div>
+      <div class="text">
+        <label for="">Amount:</label>
+        <p class="info">${ amount }</p>
+      </div>
+      <div class="text">
+        <label for="">Transaction Type:</label>
+        <p class="info">${ txnType }</p>
+      </div>
+      <div class="text">
+        <label for="">Address:</label>
+        <p class="info">${ address }</p>
+      </div>
+      <div class="text">
+        <label for="">Transaction Time:</label>
+        <p class="info">${ ( new Date( timestamp ) ).toString().slice(0, 24) }</p>
+      </div>
+    </div>`
 }
 
 function callApiAndRenderHtml( id, page = 1, successCallback ) {
