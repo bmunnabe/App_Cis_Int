@@ -38,13 +38,11 @@ function callApiAndRenderHtml( id, page = 1, successCallback ) {
 document.addEventListener("DOMContentLoaded", () => {
   const submitButton = document.getElementById('submit-btn');
   const dropdown = document.getElementById('user-select');
-
   submitButton.addEventListener( 'click', () => {
     page = 1;
     monthlyStatements( document ).innerHTML = '';
     callApiAndRenderHtml( selectedId, page, ( htmlContent ) => monthlyStatements( document ).innerHTML = htmlContent );
   } );
-
   dropdown.addEventListener( 'change', (e) => {
     if ( e.target.value ) {
       selectedId = e.target.value;
