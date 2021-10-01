@@ -1,0 +1,27 @@
+#loader-view {
+  display : none;
+}
+
+.details {
+    padding: 20px;
+    background: white;
+    border: 1px solid #eee;
+    margin: 10px;
+    width: 350px;
+}
+
+.details p {
+  margin : 0;
+  line-height : 24px;
+}
+
+.info {
+  font-weight: bold;
+}
+
+button:disabled,
+button[disabled]{
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+}
